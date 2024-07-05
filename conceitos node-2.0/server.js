@@ -1,80 +1,74 @@
-import express from "express"
+import express from 'express'
+import cors from 'cors'
 import { PrismaClient } from '@prisma/client'
-import cors from "cors"
-
 
 const prisma = new PrismaClient()
 
-const app = express ()
-app.use (express.json() )
-app.use (cors ())
+const app = express()
+app.use(express.json())
+app.use(cors())
 
 
-const users = []
+app.post('/usuarios', async (req, res) => {
 
-app.get("/usuarios", async (req,res) => {
-
-    const users = await prisma.user.findMany()
-res.status (201).json(users)
-
-})
-
-app.post("/usuarios", async (req,res) => {
-
-
-
-const user = await prisma.user.create({
-data: {
-email: req.body.email,
-age: req.body.age,
-name: req.body.name
-}
-
-})
-
-res.status (201).json (user)
-    
-    
-    })
-    
-
-    app.put ("/usuarios/:id", async (req,res) => {
-            
-
-
-        const user = await prisma.user.update({
-            where: {
-                id: req.params.id
-            },
+    await prisma.user.create({
         data: {
-        email: req.body.email,
-        age: req.body.age,
-        name: req.body.name
+            email: req.body.email,
+            name: req.body.name,
+            Age: req.body.age
         }
-        
+    })
+
+    res.status(201).json(req.body)
+})
+
+app.get('/usuarios', async (req, res) => {
+
+    let users = []
+
+    if (req.query) {
+        users = await prisma.user.findMany({
+            where: {
+                name: req.query.name,
+                email: req.query.email,
+                Age: req.query.age
+            }
         })
-        
-        res.status (201).json (user)
-            
-            
-            })
-            
-            app.delete ("/usuarios/:id", async (req,res) => {
-            
+    } else {
+        users = await prisma.user.findMany()
+    }
 
 
-                await prisma.user.delete({
-                    where: {
-                        id: req.params.id
-                    },
-                
-    
-                })
-                
-                res.status (200).json ({message: "deletado o joão"})
-                    
-                    
-                    })
+    res.status(200).json(users)
+})
+
+app.put('/usuarios/:id', async (req, res) => {
+
+    await prisma.user.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            email: req.body.email,
+            name: req.body.name,
+            Age: req.body.age
+        }
+    })
+
+    res.status(201).json(req.body)
+})
+
+app.delete('/usuarios/:id', async (req, res) => {
+    await prisma.user.delete({
+        where: {
+            id: req.params.id
+        }
+    })
+
+    res.status(200).json({ message: "Usuário Deletado com Sucesso!" })
+
+})
+
+app.listen(3000)
 
 
-app.listen (3000)
