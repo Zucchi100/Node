@@ -76,7 +76,6 @@
   },
   "scripts": {
     "dev": "node --watch server.js"
-
   },
   "keywords": [],
   "author": "",
